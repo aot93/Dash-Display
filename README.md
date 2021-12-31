@@ -1,6 +1,6 @@
 # Dash-Display
 
-Codefor teensy 4 to control a gauge servo and 2 oled I2C displays.
+Code for teensy 4 to control a gauge servo and 2 oled I2C displays.
 Support for 
 odometer and trip functions
 Energy consumption
