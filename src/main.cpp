@@ -504,7 +504,7 @@ void canRX_558(const CAN_message_t &msg) //Data from VCU
 
 void canRX_560(const CAN_message_t &msg) //Data from VCU
 {
-  active_map = (msg.buf[1]);
+  active_map = (msg.buf[0]);
 }
 void displayodometer()
 {
