@@ -20,8 +20,6 @@
   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
-
 #include <Metro.h>
 #include <FlexCAN_T4.h>
 #include <SwitecX12.h>
@@ -52,6 +50,7 @@ CAN_message_t msg;
 
 void canRX_555(const CAN_message_t &msg); //Data from VCU
 void canRX_558(const CAN_message_t &msg); //Data from VCU
+void canRX_560(const CAN_message_t &msg); //Data from VCU
 
 void displayodometer();
 void updateodometer();
@@ -194,6 +193,7 @@ int powerBar;
 int chargerHVbatteryVolts; // scale *2
 uint8_t avgChargerTemp;
 uint8_t avgMotorTemp;
+uint8_t active_map;
 
 int numCanpkts = 0;
 
@@ -277,6 +277,8 @@ void setup()
   Can1.onReceive(MB0, canRX_555); //Call this function on RX 555
   Can1.setMBFilter(MB1, 0x558);   //Filter messages
   Can1.onReceive(MB1, canRX_558); //Call this function on RX 558
+  Can1.setMBFilter(MB1, 0x560);   //Filter messages
+  Can1.onReceive(MB1, canRX_560); //Call this function on RX 560
 
   Can1.mailboxStatus();
   Can2.mailboxStatus();
@@ -364,6 +366,30 @@ void loop()
     display_info.setFont(u8g2_font_fub30_tf);
     display_info.drawStr(96, 44, "F");
     display_info.drawFrame(90, 8, 35, 40);
+    // Draw Active Map
+    switch (active_map)
+    {
+    case 1:
+      display_info.setFont(u8g2_font_fub11_tf);
+      display_info.drawStr(74, 22, "N");
+      display_info.drawFrame(72, 8, 16, 16);
+
+      break;
+
+    case 2:
+      display_info.setFont(u8g2_font_fub11_tf);
+      display_info.drawStr(74, 22, "E");
+      display_info.drawFrame(72, 8, 16, 16);
+
+      break;
+
+    case 3:
+      display_info.setFont(u8g2_font_fub11_tf);
+      display_info.drawStr(74, 22, "S");
+      display_info.drawFrame(72, 8, 16, 16);
+
+      break;
+    }
 
     break;
 
@@ -474,6 +500,11 @@ void canRX_558(const CAN_message_t &msg) //Data from VCU
   torqueReuest = ((((msg.buf[6] * 256) + msg.buf[7]) - 10000) / 10);
 
   kwInst = ((BMS_currentact * -1.0) * BMS_packvoltage) / 1000.0;
+}
+
+void canRX_560(const CAN_message_t &msg) //Data from VCU
+{
+  active_map = (msg.buf[1]);
 }
 void displayodometer()
 {
@@ -741,7 +772,7 @@ void displayinfo()
   }
   //Power Bar..
   display_info.drawRFrame(1, 36, 84, 14, 1);     //Outline
-  display_info.drawHVLine(30,17,16,1); //zero line
+  display_info.drawHVLine(24, 34, 16, 1);        //zero line
   powerBar = map(kwInst, -20, 50, 0, 84);        //Map -20 to 50Kw
   display_info.drawRBox(1, 36, powerBar, 14, 1); // Bar
 }
@@ -760,6 +791,8 @@ void showStats()
   Serial.print(VCU_Status);
   Serial.print(" BMS Status: ");
   Serial.print(BMS_Status);
+  Serial.print(" Active Map:");
+  Serial.print(active_map);
   Serial.print(" BMS SOC: ");
   Serial.print(BMS_SOC);
   Serial.print(" BMS Curr ACT: ");
