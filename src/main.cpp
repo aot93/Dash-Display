@@ -277,8 +277,8 @@ void setup()
   Can1.onReceive(MB0, canRX_555); //Call this function on RX 555
   Can1.setMBFilter(MB1, 0x558);   //Filter messages
   Can1.onReceive(MB1, canRX_558); //Call this function on RX 558
-  Can1.setMBFilter(MB1, 0x560);   //Filter messages
-  Can1.onReceive(MB1, canRX_560); //Call this function on RX 560
+  Can1.setMBFilter(MB2, 0x560);   //Filter messages
+  Can1.onReceive(MB2, canRX_560); //Call this function on RX 560
 
   Can1.mailboxStatus();
   Can2.mailboxStatus();
